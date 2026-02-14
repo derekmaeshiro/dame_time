@@ -4,20 +4,25 @@ OBJCOPY = arm-none-eabi-objcopy
 SIZE = arm-none-eabi-size
 OPENOCD = openocd
 
-# Cloned STM32CubeF4 repo
+# Project Paths
+SRC_DIR = src
+BUILD_DIR = build
 STM_PATH = /Users/derekmaeshiro/projects/STM32CubeF4
 
-# Include Directories
-INCLUDE = -I. \
-		  -I$(STM_PATH)/Drivers/CMSIS/Include \
-		  -I$(STM_PATH)/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+# Project Files
+TARGET = dame_time
+# Automatically find all .c and .s files in the src directory
+SOURCES = $(wildcard $(SRC_DIR)/*.c)
+STARTUP = $(wildcard $(SRC_DIR)/*.s)
 
-# 2. Project Files
-TARGET = firmware
-SOURCES = main.c
-STARTUP = startup_stm32f401xe.s
-# Fixed the extension mapping for the startup file
-OBJECTS = $(SOURCES:.c=.o) $(STARTUP:.s=.o)
+# Create a list of object files in the build directory
+OBJECTS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SOURCES))
+OBJECTS += $(patsubst $(SRC_DIR)/%.s, $(BUILD_DIR)/%.o, $(STARTUP))
+
+# Include Directories
+INCLUDE = -I$(SRC_DIR) \
+          -I$(STM_PATH)/Drivers/CMSIS/Include \
+          -I$(STM_PATH)/Drivers/CMSIS/Device/ST/STM32F4xx/Include
 
 # 3. Build Flags
 MCU_FLAGS = -mcpu=cortex-m4 -mthumb
@@ -25,29 +30,34 @@ CFLAGS = $(MCU_FLAGS) -O0 -g -Wall -Wextra $(INCLUDE)
 LDFLAGS = -T linker_script.ld -nostdlib -nostartfiles -nodefaultlibs
 
 # 4. Build Rules
-all: $(TARGET).bin
+all: $(BUILD_DIR)/$(TARGET).bin
 
-$(TARGET).bin: $(TARGET).elf
+# Rule to generate the binary file
+$(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)/$(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
 	$(SIZE) $<
 
-# Changed '@' to ':'
-$(TARGET).elf: $(OBJECTS)
+# Rule to link the ELF file
+$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
-# Rule for C files
-%.o: %.c
+# Rule for C files: Compiles src/%.c to build/%.o
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Rule for Assembly files (.s)
-%.o: %.s
+# Rule for Assembly files: Compiles src/%.s to build/%.o
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.s | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Flash Rule
-flash: $(TARGET).bin
-	$(OPENOCD) -f interface/stlink.cfg -f target/stm32f4x.cfg -c "program $(TARGET).elf verify reset exit"
+# Create the build directory if it doesn't exist
+$(BUILD_DIR):
+	mkdir -p $@
+
+# Flash Rule (Updated to point to the binary in build folder)
+flash: $(BUILD_DIR)/$(TARGET).bin
+	$(OPENOCD) -f interface/stlink.cfg -f target/stm32f4x.cfg -c "program $(BUILD_DIR)/$(TARGET).elf verify reset exit"
 
 clean:
-	rm -f $(OBJECTS) $(TARGET).elf $(TARGET).bin
+	rm -rf $(BUILD_DIR)
 
-.PHONY: all clean
+.PHONY: all clean flash

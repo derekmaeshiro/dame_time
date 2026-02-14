@@ -18,6 +18,6 @@ int main(void) {
 
     while (1) {
         GPIOA->ODR ^= BIT_5;
-        delay(100000);
+        delay(5000000);
     }
 }
