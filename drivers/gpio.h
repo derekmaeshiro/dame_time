@@ -7,6 +7,8 @@
 #define PORT_B 1
 #define PORT_C 2
 
+#include <stdint.h>
+
 typedef enum {
 // for shot clock
     GPIO_TX = PIN_DEF(PORT_A, 2), // PA2
@@ -88,9 +90,22 @@ struct gpio_config {
     gpio_irq_edge_e irq_edge;
 };
 
+#define GPIO_CONFIG_DEFAULT {               \
+    .mode = GPIO_OUTPUT,                     \
+    .resistor = GPIO_PULL_NONE,             \
+    .speed = GPIO_LOW_SPEED,                \
+    .o_type = GPIO_OTYPE_PUSH_PULL,         \
+    .alt_function = ALT_FUNCTION_0,         \
+    .irq_edge = GPIO_IRQ_NONE,              \
+}
+
 // functions
-void gpio_configure(gpio_e pin, const struct gpio_config* config);
 void gpio_enable_clock(uint8_t port_idx);
+void gpio_configure(gpio_e pin, const struct gpio_config* config);
+
+// read/write
+gpio_state_e gpio_read(gpio_e pin);
+void gpio_write(gpio_e pin, gpio_state_e state);
 
 // setter functions
 void gpio_set_mode(gpio_e pin, gpio_mode_e mode);

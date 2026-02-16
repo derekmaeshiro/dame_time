@@ -6,7 +6,9 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/common",
                 "${workspaceFolder}/drivers",
-                "${workspaceFolder}/src"
+                "${workspaceFolder}/src",
+                "/Users/derekmaeshiro/projects/STM32CubeF4/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
+                "/Users/derekmaeshiro/projects/STM32CubeF4/Drivers/CMSIS/Include"
             ],
             "defines": [],
             "macFrameworkPath": [
@@ -16,7 +18,6 @@
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64",
-            "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
     "version": 4

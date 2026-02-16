@@ -1,4 +1,6 @@
 #include "stm32f401xe.h"
+#include "gpio.h"
+
 #define BIT_5 (1UL << 5)
 
 void SystemInit(void) {}
@@ -10,14 +12,13 @@ void delay(volatile uint32_t count) {
 }
 
 int main(void) {
-    // enable the clock for GPIOA
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; // is this the same as RCC->AHB1ENR |= (1);
-
-    GPIOA->MODER &= ~(3UL << (5 * 2)); // reset the 10th bit from the right
-    GPIOA->MODER |= (1UL << (5 * 2)); // set PA5 to output
+    const struct gpio_config led_config = GPIO_CONFIG_DEFAULT;
+    gpio_configure(5U, &led_config);
 
     while (1) {
-        GPIOA->ODR ^= BIT_5;
-        delay(5000000);
+        gpio_write(5U, HIGH);
+        delay(1000000);
+        gpio_write(5U, LOW);
+        delay(1000000);
     }
 }

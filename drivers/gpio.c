@@ -32,13 +32,30 @@ void gpio_enable_clock(uint8_t port_idx) {
 }
 
 void gpio_configure(gpio_e pin, const struct gpio_config* config) {
-    gpio_enable_clock(pin / 16);
+    gpio_enable_clock(gpio_port_idx(pin));
     gpio_set_mode(pin, config->mode);
     gpio_set_resistor(pin, config->resistor);
     gpio_set_output_type(pin, config->o_type);
     gpio_set_speed(pin, config->speed);
     gpio_set_alt_function(pin, config->alt_function);
     gpio_set_irq_edge(pin, config->irq_edge);
+}
+
+gpio_state_e gpio_read(gpio_e pin) {
+    const uint8_t port_idx = gpio_port_idx(pin);
+    const uint8_t pin_idx = gpio_pin_idx(pin);
+    volatile uint32_t* IDR_Address = &GPIO_PORTS[port_idx]->IDR;
+    uint32_t local = *IDR_Address;
+    uint32_t mask = 1U << pin_idx;
+
+    return ((local & mask) >> pin_idx);
+}
+
+void gpio_write(gpio_e pin, gpio_state_e state) {
+    const uint8_t port_idx = gpio_port_idx(pin);
+    const uint8_t pin_idx = gpio_pin_idx(pin);
+
+    GPIO_PORTS[port_idx]->BSRR = (1U << (pin_idx + (state ? 0 : 16)));
 }
 
 void gpio_set_mode(gpio_e pin, gpio_mode_e mode) {
