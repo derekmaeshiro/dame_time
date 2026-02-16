@@ -1,18 +1,24 @@
 #ifndef GPIO_H
 #define GPIO_H
 
+#define PIN_DEF(port, pin) ((port << 4) | (pin))
+
+#define PORT_A 0
+#define PORT_B 1
+#define PORT_C 2
+
 typedef enum {
 // for shot clock
-    GPIO_TX, // PA2
-    GPIO_RX, // PA3
-    GPIO_TEST_LED, // PB0
-    GPIO_SCK_1, // PA5
-    GPIO_MISO_1, // PA6
-    GPIO_MOSI_1, // PA7
-    GPIO_CSN_1, // PB6
-    GPIO_CE_1, // PB7
-    GPIO_IRQ, // PA8
-    GPIO_WS_DATA, // PA0
+    GPIO_TX = PIN_DEF(PORT_A, 2), // PA2
+    GPIO_RX = PIN_DEF(PORT_A, 3), // PA3
+    GPIO_TEST_LED = PIN_DEF(PORT_B, 0), // PB0
+    GPIO_SCK_1 = PIN_DEF(PORT_A, 5), // PA5
+    GPIO_MISO_1 = PIN_DEF(PORT_A, 6), // PA6
+    GPIO_MOSI_1 = PIN_DEF(PORT_A, 7), // PA7
+    GPIO_CSN_1 = PIN_DEF(PORT_B, 6), // PB6
+    GPIO_CE_1 = PIN_DEF(PORT_B, 7), // PB7
+    GPIO_IRQ = PIN_DEF(PORT_A, 8), // PA8
+    GPIO_WS_DATA = PIN_DEF(PORT_A, 0), // PA0
 } gpio_e;
 
 typedef enum {
@@ -61,6 +67,7 @@ typedef enum {
 } gpio_alt_function_e;
 
 typedef enum {
+    GPIO_IRQ_NONE,
     GPIO_IRQ_RISING_EDGE,
     GPIO_IRQ_FALLING_EDGE,
     GPIO_IRQ_RISING_FALLING_EDGE,
@@ -72,8 +79,20 @@ typedef enum {
 } gpio_state_e;
 
 // structs
+struct gpio_config {
+    gpio_mode_e mode;
+    gpio_resistor_e resistor;
+    gpio_speed_e speed;
+    gpio_otype_e o_type;
+    gpio_alt_function_e alt_function;
+    gpio_irq_edge_e irq_edge;
+};
 
 // functions
+void gpio_configure(gpio_e pin, const struct gpio_config* config);
+void gpio_enable_clock(uint8_t port_idx);
+
+// setter functions
 void gpio_set_mode(gpio_e pin, gpio_mode_e mode);
 void gpio_set_resistor(gpio_e pin, gpio_resistor_e resistor);
 void gpio_set_output_type(gpio_e pin, gpio_otype_e output_type);
