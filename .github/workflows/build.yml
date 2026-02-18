@@ -13,30 +13,19 @@ jobs:
         with:
           path: main-repo
 
-      - name: Checkout STM32 Libraries
+      - name: Checkout STM32 Libraries  
         uses: actions/checkout@v4
         with:
           repository: STMicroelectronics/STM32CubeF4
           path: stm32-libs
+          # We need to be more specific with the paths to ensure the .h files are pulled
           sparse-checkout: |
-            Drivers/CMSIS/Include
             Drivers/CMSIS/Device/ST/STM32F4xx/Include
-
-      - name: Install Toolchain
-        uses: carlosperate/arm-none-eabi-gcc-action@v1
-        with:
-          release: '12.2.Rel1'
+            Drivers/CMSIS/Include
 
       - name: Build Project
-        # We run the command inside main-repo and point STM_PATH to the downloaded libs
-        working-directory: ./main-repo
-        run: make STM_PATH=${{ github.workspace }}/stm32-libs
-
-      - name: Commit and Push Binaries
         working-directory: ./main-repo
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add build/*.bin || echo "No binaries found"
-          git commit -m "chore: upload build artifacts [skip ci]" || echo "No changes"
-          git push
+          # We manually check if the file exists to debug if it fails again
+          ls -R ../stm32-libs/Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h
+          make STM_PATH=${{ github.workspace }}/stm32-libs
