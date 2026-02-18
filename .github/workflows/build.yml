@@ -17,6 +17,7 @@ jobs:
         with:
           repository: STMicroelectronics/STM32CubeF4
           path: stm32-libs # Put libraries in a subfolder
+          submodules: recursive
 
       - name: Install Toolchain
         uses: carlosperate/arm-none-eabi-gcc-action@v1
