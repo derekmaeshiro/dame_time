@@ -18,12 +18,11 @@ jobs:
         with:
           repository: STMicroelectronics/STM32CubeF4
           path: stm32-libs
-          # We pull the whole Drivers folder to be safe; it's the core of what you need
-          sparse-checkout: Drivers
+          # Removing sparse-checkout to ensure no files are missed
 
       - name: Build Project
         working-directory: ./main-repo
         run: |
-          # This 'find' command will confirm exactly where the file landed
-          find ../stm32-libs -name "stm32f401xe.h"
+          # Verify the library exists before running make
+          ls ../stm32-libs/Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h
           make STM_PATH=${{ github.workspace }}/stm32-libs
