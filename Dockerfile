@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     git \
     make \
-    bzip2
+    bzip2 \
+    xz-utils
 
 # 3. Install the ARM Compiler
 # We download and unzip it to the /opt folder
