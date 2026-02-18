@@ -4,6 +4,10 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
     
     # <--- MAGIC HAPPENS HERE
     # Instead of a blank Ubuntu, we start inside your custom image
