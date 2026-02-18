@@ -13,19 +13,17 @@ jobs:
         with:
           path: main-repo
 
-      - name: Checkout STM32 Libraries  
+      - name: Checkout STM32 Libraries
         uses: actions/checkout@v4
         with:
           repository: STMicroelectronics/STM32CubeF4
           path: stm32-libs
-          # We need to be more specific with the paths to ensure the .h files are pulled
-          sparse-checkout: |
-            Drivers/CMSIS/Device/ST/STM32F4xx/Include
-            Drivers/CMSIS/Include
+          # We pull the whole Drivers folder to be safe; it's the core of what you need
+          sparse-checkout: Drivers
 
       - name: Build Project
         working-directory: ./main-repo
         run: |
-          # We manually check if the file exists to debug if it fails again
-          ls -R ../stm32-libs/Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h
+          # This 'find' command will confirm exactly where the file landed
+          find ../stm32-libs -name "stm32f401xe.h"
           make STM_PATH=${{ github.workspace }}/stm32-libs
