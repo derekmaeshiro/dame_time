@@ -8,21 +8,35 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout Your Code
         uses: actions/checkout@v4
+        with:
+          path: main-repo
+
+      - name: Checkout STM32 Libraries
+        uses: actions/checkout@v4
+        with:
+          repository: STMicroelectronics/STM32CubeF4
+          path: stm32-libs
+          sparse-checkout: |
+            Drivers/CMSIS/Include
+            Drivers/CMSIS/Device/ST/STM32F4xx/Include
 
       - name: Install Toolchain
         uses: carlosperate/arm-none-eabi-gcc-action@v1
         with:
-          release: '12.2.Rel1' 
+          release: '12.2.Rel1'
 
       - name: Build Project
-        run: make
+        # We run the command inside main-repo and point STM_PATH to the downloaded libs
+        working-directory: ./main-repo
+        run: make STM_PATH=${{ github.workspace }}/stm32-libs
 
       - name: Commit and Push Binaries
+        working-directory: ./main-repo
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add *.bin *.hex || echo "No binaries found"
+          git add build/*.bin || echo "No binaries found"
           git commit -m "chore: upload build artifacts [skip ci]" || echo "No changes"
           git push
