@@ -1,33 +1,24 @@
-name: STM32 Build and Sync
+name: STM32 Build
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    
+    # <--- MAGIC HAPPENS HERE
+    # Instead of a blank Ubuntu, we start inside your custom image
+    container:
+      image: ghcr.io/${{ github.repository }}:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout Your Code
         uses: actions/checkout@v4
-        # No 'path' here - puts your code in the root workspace folder
-
-      - name: Checkout STM32 Libraries
-        uses: actions/checkout@v4
-        with:
-          repository: STMicroelectronics/STM32CubeF4
-          path: stm32-libs # Put libraries in a subfolder
-          submodules: recursive
-
-      - name: Install Toolchain
-        uses: carlosperate/arm-none-eabi-gcc-action@v1
-        with:
-          release: '12.2.Rel1'
-
-      - name: Debug - Find Header Path
-        # This will find the ACTUAL path of the file on the runner
-        run: find ${{ github.workspace }}/stm32-libs -name "stm32f401xe.h"
+        # We don't need submodules here because the STM32 libs are already in the image!
 
       - name: Build Project
-        # We point STM_PATH to the absolute path of the libs folder
-        run: make STM_PATH=${{ github.workspace }}/stm32-libs
+        # The image already set the STM_PATH environment variable
+        # The image already has arm-none-eabi-gcc installed
+        run: make

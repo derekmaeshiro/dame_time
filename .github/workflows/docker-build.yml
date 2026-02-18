@@ -1,0 +1,36 @@
+name: Build Docker Image
+on:
+  push:
+    paths:
+      - 'Dockerfile' # <--- IMPORTANT: Only runs if you change the Dockerfile
+
+# Define variables to keep things clean
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }} # This will look like "yourname/repo"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # <--- We need permission to save the image to your account
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # This tags the image as "latest" so we can find it easily later
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
