@@ -20,7 +20,8 @@ typedef enum {
     GPIO_CSN_1 = PIN_DEF(PORT_B, 6), // PB6
     GPIO_CE_1 = PIN_DEF(PORT_B, 7), // PB7
     GPIO_IRQ = PIN_DEF(PORT_A, 8), // PA8
-    GPIO_WS_DATA = PIN_DEF(PORT_A, 0), // PA0
+    GPIO_WS_DATA_1 = PIN_DEF(PORT_A, 0), // PA0
+    GPIO_WS_DATA_2 = PIN_DEF(PORT_A, 1), // PA1
 } gpio_e;
 
 typedef enum {
