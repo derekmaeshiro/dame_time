@@ -20,8 +20,9 @@ typedef enum {
     GPIO_CSN_1 = PIN_DEF(PORT_B, 6), // PB6
     GPIO_CE_1 = PIN_DEF(PORT_B, 7), // PB7
     GPIO_IRQ = PIN_DEF(PORT_A, 8), // PA8
-    GPIO_WS_DATA_1 = PIN_DEF(PORT_A, 0), // PA0
-    GPIO_WS_DATA_2 = PIN_DEF(PORT_A, 1), // PA1
+
+    // LED handles point to SPI MOSI pin
+    GPIO_WS_DATA_1 = PIN_DEF(PORT_A, 7), // PA7 --> 
 } gpio_e;
 
 typedef enum {
@@ -99,6 +100,9 @@ struct gpio_config {
     .alt_function = ALT_FUNCTION_0,         \
     .irq_edge = GPIO_IRQ_NONE,              \
 }
+
+// init
+void gpio_init(void);
 
 // functions
 void gpio_enable_clock(uint8_t port_idx);

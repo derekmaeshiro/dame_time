@@ -26,6 +26,26 @@ static GPIO_TypeDef *const GPIO_PORTS[] = {
     GPIOC,
 };
 
+// initialization
+void gpio_init() {
+    // test led config
+    const struct gpio_config led_config = GPIO_CONFIG_DEFAULT;
+    gpio_configure(GPIO_TEST_LED, &led_config);
+
+    // spi config
+    const struct gpio_config spi_config = {
+        .mode = GPIO_ALT,
+        .resistor = GPIO_PULL_NONE,
+        .speed = GPIO_HIGH_SPEED,
+        .o_type = GPIO_OTYPE_PUSH_PULL,
+        .alt_function = ALT_FUNCTION_5,
+    };
+
+    gpio_configure(GPIO_SCK_1, &spi_config);
+    gpio_configure(GPIO_MOSI_1, &spi_config);
+    gpio_configure(GPIO_MISO_1, &spi_config);
+}
+
 // function implementations
 void gpio_enable_clock(uint8_t port_idx) {
     RCC->AHB1ENR |= (1 << port_idx);
