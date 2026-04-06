@@ -53,5 +53,7 @@ const spi_config_s spi_led_config = {
 };
 
 void spi_init(SPI_TypeDef *SPIx, spi_config_s *config);
+void spi_send_byte(SPI_TypeDef *SPIx, uint8_t data);
+uint8_t spi_receive_byte(void);
 
 #endif
